@@ -1,0 +1,151 @@
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "Andepzai",
+    SubTitle = "by Zhoihr/and", 
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+
+if CoreGui:FindFirstChild("FluentToggleButtonGui") then
+    CoreGui.FluentToggleButtonGui:Destroy()
+end
+
+local ToggleGui = Instance.new("ScreenGui")
+ToggleGui.Name = "FluentToggleButtonGui"
+ToggleGui.Parent = CoreGui
+
+local Button = Instance.new("ImageButton")
+Button.Name = "ToggleButton"
+Button.Parent = ToggleGui
+Button.Position = UDim2.new(0, 20, 0.5, -25) 
+Button.Size = UDim2.fromOffset(50, 50) 
+Button.BackgroundColor3 = Color3.fromRGB(30, 30, 30) 
+Button.Image = "rbxassetid://15811453733" 
+Button.BackgroundTransparency = 0.2
+Button.BorderSizePixel = 0
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = Button
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(80, 80, 80)
+UIStroke.Thickness = 1.5
+UIStroke.Parent = Button
+
+Button.MouseButton1Click:Connect(function()
+    Button:TweenSize(UDim2.fromOffset(45, 45), "Out", "Quad", 0.1, true, function()
+        Button:TweenSize(UDim2.fromOffset(50, 50), "Out", "Quad", 0.1)
+    end)
+    Window:Minimize() 
+end)
+
+local UserInputService = game:GetService("UserInputService")
+local dragging, dragInput, dragStart, startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    Button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+Button.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = Button.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Button.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+local Tabs = {
+    Farming = Window:AddTab({ Title = "Farming", Icon = "swords" }),
+    Config = Window:AddTab({ Title = "Config", Icon = "settings" }),
+    StackItem = Window:AddTab({ Title = "Stack Item", Icon = "box" }),
+    NextUpdate = Window:AddTab({ Title = "Next Update", Icon = "info" })
+}
+
+-- Menu Farming
+Tabs.Farming:AddToggle("FarmLevel", {Title = "Farming Level (beta)", Default = false})
+Tabs.Farming:AddToggle("FarmNebrest", {Title = "Farming NEBREST (beta)", Default = false})
+
+Tabs.Farming:AddSection("Category: Sea 3")
+Tabs.Farming:AddToggle("BonesFarm", {Title = "Bones", Default = false})
+Tabs.Farming:AddToggle("KatakuriFarm", {Title = "Katakuri", Default = false})
+Tabs.Farming:AddToggle("MaterialFarm", {Title = "Farming Material", Default = false})
+Tabs.Farming:AddToggle("SekitarFarm", {Title = "Farming Sekitar", Default = false})
+
+-- Menu Config
+Tabs.Config:AddToggle("FastAttack", {Title = "Fast Attack", Default = false})
+
+Tabs.Config:AddDropdown("SelectTools", {
+    Title = "Select Tools",
+    Values = {"Melee", "Sword", "Gun", "Fruit"},
+    CurrentValue = "Melee"
+})
+
+Tabs.Config:AddSlider("TweenSpeed", {Title = "Tween Speed", Min = 100, Max = 250, Default = 150, Rounding = 0})
+Tabs.Config:AddSlider("WalkSpeed", {Title = "Walk Speed", Min = 16, Max = 500, Default = 16, Rounding = 0})
+Tabs.Config:AddSlider("JumpPower", {Title = "Jump Power", Min = 50, Max = 500, Default = 50, Rounding = 0})
+
+Tabs.Config:AddDropdown("ModeFarm", {
+    Title = "Mode Farm",
+    Values = {"Orbit", "Silent", "1 hit"},
+    CurrentValue = "Orbit"
+})
+
+-- Menu Stack Item
+Tabs.StackItem:AddSection("Category: Prehistoric Island")
+Tabs.StackItem:AddToggle("FarmGolem", {Title = "Auto Farm Golem", Default = false})
+Tabs.StackItem:AddToggle("PatchVulcano", {Title = "Auto Patch Vulcano", Default = false})
+Tabs.StackItem:AddToggle("PreGetBones", {Title = "Get Bones", Default = false})
+Tabs.StackItem:AddToggle("PreGetEgg", {Title = "Get Egg", Default = false})
+
+Tabs.StackItem:AddSection("Category: Migare Island")
+Tabs.StackItem:AddButton({Title = "Tween to Migare", Callback = function() end})
+Tabs.StackItem:AddButton({Title = "Tween to Blue Gear", Callback = function() end})
+Tabs.StackItem:AddToggle("Migare20Y", {Title = "20+y", Default = false})
+
+Tabs.StackItem:AddSection("Category: Kitsune Island")
+Tabs.StackItem:AddToggle("AzureAmber", {Title = "Azure Amber", Default = false})
+Tabs.StackItem:AddToggle("GachaKitsune", {Title = "Gacha", Default = false})
+Tabs.StackItem:AddButton({Title = "Reset", Callback = function() end}
+Tabs.StackItem:AddButton({Title = "Everyone all is beta", Callback = function() end})
+
+-- Menu Next Update
+Tabs.NextUpdate:AddParagraph({
+    Title = "Join DC for information",
+    Content = "https://discord.gg/kpNu2htbZ3"
+})
+
+Tabs.NextUpdate:AddButton({
+    Title = "Copy Discord Link",
+    Callback = function()
+        setclipboard("https://discord.gg/kpNu2htbZ3")
+    end
+})
+
+Fluent:SelectTab(1)
